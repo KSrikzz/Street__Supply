@@ -62,6 +62,15 @@
     }
 
     fetchProducts();
+    window.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("You must log in first");
+        window.location.href = "login.html";
+    }
+
+    // You can now use token to fetch user data or products
+});
   </script>
 </body>
 </html>

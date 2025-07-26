@@ -28,70 +28,61 @@
 
   <script>
     const token = localStorage.getItem("token");
+if (!token) {
+  alert("Please log in first");
+  window.location.href = "login.html";
+}
 
-    async function fetchProducts() {
-      const res = await fetch("/api/products", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const products = await res.json();
-      const list = document.getElementById("productList");
+// Fetch and render items
+async function loadItems() {
+  const res = await fetch("http://localhost:5000/api/vendor/items", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  const list = document.getElementById("itemList");
+  list.innerHTML = "";
+  data.forEach((item) => {
+    list.innerHTML += `
+      <div>
+        <strong>${item.name}</strong> - ${item.quantity} pcs @ ₹${item.price}
+        <button onclick="deleteItem('${item._id}')">Delete</button>
+      </div>
+    `;
+  });
+}
 
-      if (products.length === 0) {
-        list.innerHTML = "<p>No products available.</p>";
-        return;
-      }
+// Add item
+document.getElementById("addItemForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("itemName").value;
+  const quantity = document.getElementById("quantity").value;
+  const price = document.getElementById("price").value;
 
-      list.innerHTML = products.map(p => `
-        <div class="product">
-          <h4>${p.name}</h4>
-          <p>Seller: ${p.sellerName}</p>
-          <p>Available: ${p.quantity} | Price: ₹${p.price}</p>
-          ${p.quantity > 0 ? `<button onclick="openForm('${p._id}', '${p.sellerId}')">Order</button>` : `<span class="out-of-stock">Out of stock</span>`}
-        </div>
-      `).join('');
-    }
+  await fetch("http://localhost:5000/api/vendor/item", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, quantity, price }),
+  });
 
-    function openForm(productId, sellerId) {
-      document.getElementById("orderForm").classList.remove("hidden");
-      document.getElementById("productId").value = productId;
-      document.getElementById("sellerId").value = sellerId;
-    }
+  loadItems();
+});
 
-    function closeForm() {
-      document.getElementById("orderForm").classList.add("hidden");
-    }
+// Delete item
+async function deleteItem(id) {
+  await fetch(`http://localhost:5000/api/vendor/item/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  loadItems();
+}
 
-    async function submitOrder() {
-      const order = {
-        name: document.getElementById("vendorName").value,
-        address: document.getElementById("address").value,
-        phone: document.getElementById("phone").value,
-        date: document.getElementById("deliveryDate").value,
-        quantity: document.getElementById("orderQuantity").value,
-        productId: document.getElementById("productId").value,
-        sellerId: document.getElementById("sellerId").value
-      };
-
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(order)
-      });
-
-      if (res.ok) {
-        alert("Order placed successfully");
-        closeForm();
-        fetchProducts(); // refresh stock
-      } else {
-        const err = await res.json();
-        alert("Error: " + err.message);
-      }
-    }
-
-    fetchProducts();
+// On page load
+loadItems();
   </script>
 </body>
 </html>
