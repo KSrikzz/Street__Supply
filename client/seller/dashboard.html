@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Seller Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Your Products</h2>
+    <div id="productList"></div>
+
+    <h3>Add Product</h3>
+    <input type="text" id="pname" placeholder="Product Name" />
+    <input type="number" id="quantity" placeholder="Quantity" />
+    <input type="number" id="price" placeholder="Price" />
+    <button onclick="addProduct()">Add Product</button>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+
+    async function fetchProducts() {
+      const res = await fetch("/api/products/mine", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const products = await res.json();
+      const container = document.getElementById("productList");
+      container.innerHTML = products.map(p => `
+        <div>
+          <strong>${p.name}</strong> - ${p.quantity} units @ ₹${p.price}
+          <button onclick="deleteProduct('${p._id}')">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    async function addProduct() {
+      const name = document.getElementById("pname").value;
+      const quantity = document.getElementById("quantity").value;
+      const price = document.getElementById("price").value;
+
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, quantity, price })
+      });
+
+      if (res.ok) {
+        alert("Product added");
+        fetchProducts();
+      }
+    }
+
+    async function deleteProduct(id) {
+      await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchProducts();
+    }
+
+    fetchProducts();
+  </script>
+</body>
+</html>

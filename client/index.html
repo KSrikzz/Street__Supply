@@ -1,13 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Street Vendor</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Street Supply</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e6f2d9, #ffffff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #3c763d;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      text-decoration: none;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .seller-btn {
+      background-color: #28a745;
+    }
+
+    .vendor-btn {
+      background-color: #17a2b8;
+    }
+  </style>
 </head>
 <body>
-<h1>Welcome</h1>
-<button onclick="location.href='seller/login.html'">I am a Seller</button>
-<button onclick="location.href='vendor/login.html'">I am a Vendor</button>
+  <div class="container">
+    <h1 class="title">Welcome to Street Supply</h1>
+    <p class="subtitle">Choose your role to continue:</p>
+
+    <a href="seller/login.html" class="btn seller-btn">I am a Seller</a>
+    <a href="vendor/login.html" class="btn vendor-btn">I am a Vendor</a>
+  </div>
 </body>
 </html>

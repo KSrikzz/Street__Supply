@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vendor Register</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Vendor Register</h2>
+    <input type="text" id="name" placeholder="Name" />
+    <input type="text" id="username" placeholder="Username" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" />
+    <button onclick="register()">Register</button>
+    <p><a href="login.html">Already have an account? Login</a></p>
+  </div>
+  <script>
+    async function register() {
+      const name = document.getElementById("name").value;
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) return alert("Passwords do not match");
+
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, username, email, password, role: "vendor" }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Registered successfully!");
+        window.location.href = "login.html";
+      } else {
+        alert(data.message);
+      }
+    }
+  </script>
+</body>
+</html>
