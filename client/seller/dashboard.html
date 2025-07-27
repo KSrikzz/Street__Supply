@@ -10,67 +10,84 @@
     <div id="productList"></div>
 
     <h3>Add Product</h3>
-    <input type="text" id="pname" placeholder="Product Name" />
-    <input type="number" id="quantity" placeholder="Quantity" />
-    <input type="number" id="price" placeholder="Price" />
-    <button onclick="addProduct()">Add Product</button>
+    <form id="addItemForm">
+      <input type="text" id="pname" placeholder="Product Name" required />
+      <input type="number" id="quantity" placeholder="Quantity" required />
+      <input type="number" id="price" placeholder="Price" required />
+      <button type="submit">Add Product</button>
+    </form>
+
+    <h3>Orders Received</h3>
+    <ul id="orderList"></ul>
   </div>
 
   <script>
-    const token = localStorage.getItem("token");
+  document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
 
-    async function fetchProducts() {
-      const res = await fetch("/api/products/mine", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const products = await res.json();
-      const container = document.getElementById("productList");
-      container.innerHTML = products.map(p => `
-        <div>
-          <strong>${p.name}</strong> - ${p.quantity} units @ ₹${p.price}
-          <button onclick="deleteProduct('${p._id}')">Delete</button>
-        </div>
-      `).join('');
-    }
+  if (!token) {
+    alert("Please log in first.");
+    window.location.href = "../sellerLogin.html";
+    return;
+  }
 
-    async function addProduct() {
-      const name = document.getElementById("pname").value;
-      const quantity = document.getElementById("quantity").value;
-      const price = document.getElementById("price").value;
+  const fetchItems = async () => {
+    const res = await fetch("http://localhost:5000/api/products/mine", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const items = await res.json();
+    const itemList = document.getElementById("productList");
+    itemList.innerHTML = "";
 
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ name, quantity, price })
-      });
+    items.forEach(item => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        ${item.name} - ₹${item.price} (Qty: ${item.quantity})
+        <button data-id="${item._id}" class="editBtn">Edit</button>
+        <button data-id="${item._id}" class="deleteBtn">Delete</button>
+      `;
+      itemList.appendChild(li);
+    });
 
-      if (res.ok) {
-        alert("Product added");
-        fetchProducts();
-      }
-    }
+    document.querySelectorAll(".deleteBtn").forEach(btn =>
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) fetchItems();
+        else alert(data.message);
+      })
+    );
+  };
 
-    async function deleteProduct(id) {
-      await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      fetchProducts();
-    }
+  fetchItems();
 
-    fetchProducts();
-    window.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        alert("You must log in first");
-        window.location.href = "login.html";
-    }
+  document.getElementById("addItemForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const name = document.getElementById("itemName").value;
+    const quantity = document.getElementById("itemQuantity").value;
+    const price = document.getElementById("itemPrice").value;
 
-    // You can now use token to fetch user data or products
+    const res = await fetch("http://localhost:5000/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, quantity, price })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("Item added!");
+      fetchItems();
+    } else alert(data.message);
+  });
 });
+
   </script>
 </body>
 </html>

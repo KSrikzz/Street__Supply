@@ -1,4 +1,4 @@
-// frontend/js/auth.js
+// client/js/auth.js
 
 // Handle Login
 async function loginUser(email, password) {
@@ -19,3 +19,16 @@ async function registerUser(name, email, password, role) {
   });
   return await res.json();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (token && role) {
+    if (role === "seller") {
+      window.location.href = "./seller/sellerDashboard.html";
+    } else if (role === "vendor") {
+      window.location.href = "./vendor/vendorDashboard.html";
+    }
+  }
+});

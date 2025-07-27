@@ -7,21 +7,22 @@
 <body>
   <div class="container">
     <h2>Vendor Register</h2>
+    <form id="registerForm">
     <input type="text" id="name" placeholder="Name" />
     <input type="text" id="username" placeholder="Username" />
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <input type="password" id="confirmPassword" placeholder="Confirm Password" />
-    <button onclick="register()">Register</button>
+    <button type="submit">Register</button>
+    </form>
     <p><a href="login.html">Already have an account? Login</a></p>
   </div>
 <script>
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
+document.getElementById("registerForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  console.log("Submitted");
-
   const name = document.getElementById("name").value;
+  const username = document.getElementById("username").value; // ✅ added
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirmPassword").value;
@@ -32,24 +33,23 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   }
 
   try {
-    const res = await fetch("http://localhost:5000/api/vendor/register", {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, username, email, password, role: "vendor" }) // ✅ includes role
     });
 
     const data = await res.json();
-    console.log("Response:", data);
-
     if (res.ok) {
-      alert("Registration successful!");
-      window.location.href = "login.html";
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role); // ✅ save role
+      window.location.href = "../dashboard.html";
     } else {
-      alert(data.message || "Registration failed");
+      alert(data.message);
     }
   } catch (err) {
-    console.error("Error:", err);
-    alert("Something went wrong.");
+    console.error(err);
+    alert("Registration failed");
   }
 });
 </script>

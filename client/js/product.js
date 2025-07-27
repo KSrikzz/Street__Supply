@@ -1,4 +1,4 @@
-// frontend/js/product.js
+// client/js/product.js
 // Requires api.js
 
 async function addProduct(name, quantity, price) {

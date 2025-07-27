@@ -7,12 +7,14 @@
 <body>
   <div class="container">
     <h2>Seller Register</h2>
+    <form id="registerForm">
     <input type="text" id="name" placeholder="Name" />
     <input type="text" id="username" placeholder="Username" />
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <input type="password" id="confirmPassword" placeholder="Confirm Password" />
-    <button onclick="register()">Register</button>
+    <button type="submit">Register</button>
+    </form>
     <p><a href="login.html">Already have an account? Login</a></p>
   </div>
 <script>
@@ -24,6 +26,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const role = "seller"; // Make this "vendor" if it's the vendor page
 
     if (password !== confirmPassword) {
         alert("Passwords do not match");
@@ -31,10 +34,10 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     }
 
     try {
-        const response = await fetch("http://localhost:5000/api/seller/register", {
+        const response = await fetch("http://localhost:5000/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, username, email, password })
+            body: JSON.stringify({ name, username, email, password, role:"seller"})
         });
 
         const data = await response.json();

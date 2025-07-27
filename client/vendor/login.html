@@ -6,10 +6,10 @@
 </head>
 <body>
   <div class="container">
-    <h2>Vendor Login</h2>
+    <h2>Vendor Login</h2> 
     <!-- ✅ Wrap inputs in a form with an id -->
     <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required />
+      <input type="email" id="" placeholder="Email" required />
       <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Login</button>
     </form>
@@ -18,33 +18,33 @@
   </div>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value; // ✅ use username
+  const password = document.getElementById("password").value;
 
-      try {
-        const res = await fetch("http://localhost:5000/api/vendor/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          localStorage.setItem("token", data.token);
-          alert("Login successful!");
-          window.location.href = "http://localhost:5000/api/vendor/dashboard.html"; // ✅ change path if needed
-        } else {
-          alert(data.message || "Login failed");
-        }
-      } catch (err) {
-        console.error("Error:", err);
-        alert("Something went wrong.");
-      }
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }) // ✅ match backend
     });
+
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role); // ✅ store role
+      window.location.href = "../dashboard.html";
+    } else {
+      alert(data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Login failed");
+  }
+});
+
   </script>
 </body>
 </html>
